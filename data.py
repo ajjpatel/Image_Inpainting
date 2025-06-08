@@ -16,9 +16,10 @@ def find_images_recursively(root):
     return sorted(image_paths)
 
 class InpaintingDataset(Dataset):
-    def __init__(self, root, dataset='celeba', image_size=128, mask_size=64):
+    def __init__(self, root, dataset='celeba', image_size=128, mask_size=64, mask_type='mixed'):
         self.image_size = image_size
         self.mask_size = mask_size
+        self.mask_type = mask_type
         transform_list = [
             transforms.CenterCrop(min(image_size, image_size)),
             transforms.Resize((image_size, image_size)),
@@ -51,7 +52,7 @@ class InpaintingDataset(Dataset):
             img = self.transform(img)
         else:
             img, _ = self.dataset[idx] if isinstance(self.dataset[idx], tuple) else (self.dataset[idx], None)
-        mask = make_mask(self.image_size, self.mask_size)
+        mask = make_mask(self.image_size, self.mask_size, self.mask_type)
         masked_img = img.clone()
         masked_img = masked_img * (1 - mask)
         return masked_img, img, mask

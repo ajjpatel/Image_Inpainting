@@ -11,7 +11,8 @@ def train(args):
     print(f"Using device: {device}")
 
     dataset = InpaintingDataset(root=args.data_root, dataset=args.dataset,
-                                image_size=args.image_size, mask_size=args.mask_size)
+                                image_size=args.image_size, mask_size=args.mask_size, 
+                                mask_type=args.mask_type)
     loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=4)
 
     G = ContextEncoder().to(device)
@@ -64,10 +65,13 @@ def train(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Context Encoder Inpainting Training')
-    parser.add_argument('--data_root', type=str, default='data/celeba', help='path to dataset root')
-    parser.add_argument('--dataset', type=str, default='celeba', choices=['celeba','imagenet'], help='dataset to use')
+    parser.add_argument('--data_root', type=str, default='/home/ajj/Dev/context_encoder/data/celebahq-256/celeba_hq_256/', help='path to dataset root')
+    parser.add_argument('--dataset', type=str, default='celeba', choices=['celeba'], help='dataset to use')
     parser.add_argument('--image_size', type=int, default=128, help='size of input images')
     parser.add_argument('--mask_size', type=int, default=64, help='size of square mask')
+    parser.add_argument('--mask_type', type=str, default='mixed', 
+                       choices=['square', 'circle', 'triangle', 'ellipse', 'irregular', 'random_patches', 'mixed'],
+                       help='type of mask to use for training')
     parser.add_argument('--batch_size', type=int, default=32, help='batch size')
     parser.add_argument('--epochs', type=int, default=20, help='number of epochs')
     parser.add_argument('--lr', type=float, default=2e-4, help='learning rate')
