@@ -1,0 +1,25 @@
+Model Evaluation Results
+=======================
+
+Mask Type: square
+Mask Size: 64
+Image Size: 128
+
+CelebA:
+Mean L1 Loss: 0.0322
+Mean L2 Loss: 0.0088
+PSNR: 21.28 dB
+Number of Images: 1000
+
+Cityscapes:
+Mean L1 Loss: 0.0600
+Mean L2 Loss: 0.0298
+PSNR: 16.17 dB
+Number of Images: 500
+
+Places365:
+Mean L1 Loss: 0.0699
+Mean L2 Loss: 0.0393
+PSNR: 15.01 dB
+Number of Images: 1000
+

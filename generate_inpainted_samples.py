@@ -7,6 +7,7 @@ import numpy as np
 from tqdm import tqdm
 from data import InpaintingDataset
 from model import ContextEncoder
+import time
 
 
 def denorm(img_tensor):
@@ -28,6 +29,7 @@ def save_comparison_grid(samples_by_type, output_path):
     
     from PIL import Image
     
+    # Get dimensions from the first sample
     sample_height = list(samples_by_type.values())[0].shape[0]
     sample_width = list(samples_by_type.values())[0].shape[1]
     
@@ -39,17 +41,39 @@ def save_comparison_grid(samples_by_type, output_path):
     
     for i, (_, triplet_array) in enumerate(samples_by_type.items()):
         triplet_pil = Image.fromarray(triplet_array)
-        
         y_offset = i * sample_height
         grid_img.paste(triplet_pil, (0, y_offset))
     
     grid_img.save(output_path)
 
+def combine_grids(grid_paths, output_path):
+    from PIL import Image
+    
+    # Load all grid images
+    grid_images = [Image.open(path) for path in grid_paths]
+    
+    # Get dimensions from the first grid
+    grid_width = grid_images[0].width
+    grid_height = grid_images[0].height
+    
+    # Create a new image that can hold all grids side by side
+    combined_width = grid_width * len(grid_images)
+    combined_height = grid_height
+    
+    combined_img = Image.new('RGB', (combined_width, combined_height), (255, 255, 255))
+    
+    # Paste each grid image
+    for i, grid_img in enumerate(grid_images):
+        x_offset = i * grid_width
+        combined_img.paste(grid_img, (x_offset, 0))
+    
+    combined_img.save(output_path)
+
 def main():
     parser = argparse.ArgumentParser(description="Generate inpainted samples using ContextEncoder with various mask types")
     parser.add_argument('--data_root', type=str, default="data/celebahq-256/celeba_hq_256/", help='Path to dataset root')
-    parser.add_argument('--model_path', type=str, default="outputs/G_epoch1.pth", help='Path to trained ContextEncoder .pth file')
-    parser.add_argument('--num_samples', type=int, default=3, help='Number of generations to dump')
+    parser.add_argument('--model_path', type=str, default="outputs/G_best.pth", help='Path to trained ContextEncoder .pth file')
+    parser.add_argument('--num_samples', type=int, default=4, help='Number of samples to combine in the grid')
     parser.add_argument('--image_size', type=int, default=128, help='Image size (should match training)')
     parser.add_argument('--mask_size', type=int, default=64, help='Mask size (should match training)')
     parser.add_argument('--mask_type', type=str, default='mixed', 
@@ -81,11 +105,16 @@ def main():
     if args.comparison_grid and len(mask_types) > 1:
         print("Generating comparison grids...")
         
+        grid_paths = []
+        
+        # Generate 4 different samples
         for sample_idx in tqdm(range(args.num_samples), desc="Generating comparison grids"):
-            np.random.seed(sample_idx + 42)
+            # Generate a random seed between 0 and 2^32 - 1
+            random_seed = np.random.randint(0, 2**32 - 1)
+            np.random.seed(random_seed)
             
             samples_by_type = {}
-            base_img_idx = np.random.randint(0, 1000)
+            base_img_idx = np.random.randint(0, 1000)  # Random image for each sample
             
             for mask_type in mask_types:    
                 dataset = InpaintingDataset(
@@ -113,8 +142,14 @@ def main():
                 
                 samples_by_type[mask_type] = triplet
             
+            # Save individual grid
             grid_path = os.path.join(args.output_dir, f'comparison_grid_{sample_idx+1:03d}.png')
             save_comparison_grid(samples_by_type, grid_path)
+            grid_paths.append(grid_path)
+        
+        # Combine all grids into one image
+        combined_path = os.path.join(args.output_dir, 'combined_comparison_grid.png')
+        combine_grids(grid_paths, combined_path)
     
     else:
         print("Generating individual samples...")
@@ -133,6 +168,9 @@ def main():
             mask_samples = args.num_samples if len(mask_types) == 1 else max(1, args.num_samples // len(mask_types))
             
             for i in tqdm(range(mask_samples), desc=f"Generating {mask_type} samples"):
+                # Generate a random seed between 0 and 2^32 - 1
+                random_seed = np.random.randint(0, 2**32 - 1)
+                np.random.seed(random_seed)
                 idx = np.random.randint(0, len(dataset))
                 masked_img, orig_img, mask = dataset[idx]
                 masked_img = masked_img.unsqueeze(0).to(device)
@@ -155,7 +193,7 @@ def main():
     print(f"Output directory: {args.output_dir}")
     
     if args.comparison_grid and len(mask_types) > 1:
-        print(f"Generated {args.num_samples} comparison grids showing all mask types")
+        print(f"Generated {args.num_samples} comparison grids and combined them into one image")
     else:
         total_samples = args.num_samples if len(mask_types) == 1 else args.num_samples * len(mask_types)
         print(f"Generated {total_samples} individual samples with mask types: {mask_types}")

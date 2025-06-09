@@ -4,6 +4,10 @@ import random
 import math
 
 def make_mask(image_size, mask_size, mask_type='mixed'):
+    # Validate and adjust mask size if needed
+    if mask_size >= image_size:
+        mask_size = image_size - 2  # Leave at least 1 pixel margin
+    
     if mask_type == 'mixed':
         mask_types = ['square', 'circle', 'triangle', 'ellipse', 'irregular', 'random_patches']
         mask_type = random.choice(mask_types)
@@ -24,6 +28,8 @@ def make_mask(image_size, mask_size, mask_type='mixed'):
         return make_square_mask(image_size, mask_size)
 
 def make_square_mask(image_size, mask_size):
+    # Ensure mask_size is valid
+    mask_size = min(mask_size, image_size - 2)
     top = torch.randint(0, image_size - mask_size + 1, (1,)).item()
     left = torch.randint(0, image_size - mask_size + 1, (1,)).item()
     mask = torch.zeros((1, image_size, image_size))
@@ -31,7 +37,8 @@ def make_square_mask(image_size, mask_size):
     return mask
 
 def make_circle_mask(image_size, mask_size):
-    radius = mask_size // 2
+    # Ensure radius is valid
+    radius = min(mask_size // 2, (image_size - 2) // 2)
     center_x = torch.randint(radius, image_size - radius, (1,)).item()
     center_y = torch.randint(radius, image_size - radius, (1,)).item()
     
@@ -48,6 +55,8 @@ def make_circle_mask(image_size, mask_size):
 def make_triangle_mask(image_size, mask_size):
     mask = torch.zeros((1, image_size, image_size))
     
+    # Ensure mask_size is valid
+    mask_size = min(mask_size, image_size - 2)
     margin = mask_size // 2
     center_x = torch.randint(margin, image_size - margin, (1,)).item()
     center_y = torch.randint(margin, image_size - margin, (1,)).item()
@@ -68,6 +77,8 @@ def make_triangle_mask(image_size, mask_size):
 def make_ellipse_mask(image_size, mask_size):
     mask = torch.zeros((1, image_size, image_size))
     
+    # Ensure mask_size is valid
+    mask_size = min(mask_size, image_size - 2)
     margin = mask_size // 2
     center_x = torch.randint(margin, image_size - margin, (1,)).item()
     center_y = torch.randint(margin, image_size - margin, (1,)).item()
@@ -94,6 +105,8 @@ def make_ellipse_mask(image_size, mask_size):
 def make_irregular_mask(image_size, mask_size):
     mask = torch.zeros((1, image_size, image_size))
     
+    # Ensure mask_size is valid
+    mask_size = min(mask_size, image_size - 2)
     margin = max(1, mask_size // 4)
     center_x = torch.randint(margin, image_size - margin, (1,)).item()
     center_y = torch.randint(margin, image_size - margin, (1,)).item()
@@ -129,8 +142,10 @@ def make_irregular_mask(image_size, mask_size):
 def make_random_patches_mask(image_size, mask_size):
     mask = torch.zeros((1, image_size, image_size))
     
+    # Ensure mask_size is valid
+    mask_size = min(mask_size, image_size - 2)
     num_patches = torch.randint(3, 8, (1,)).item()
-    patch_size = mask_size // 3
+    patch_size = max(1, mask_size // 3)
     
     for _ in range(num_patches):
         patch_type = random.choice(['square', 'circle'])
@@ -140,7 +155,7 @@ def make_random_patches_mask(image_size, mask_size):
             left = torch.randint(0, image_size - patch_size + 1, (1,)).item()
             mask[:, top:top+patch_size, left:left+patch_size] = 1
         else:
-            radius = patch_size // 2
+            radius = max(1, patch_size // 2)
             if radius > 0:
                 center_x = torch.randint(radius, image_size - radius, (1,)).item()
                 center_y = torch.randint(radius, image_size - radius, (1,)).item()
