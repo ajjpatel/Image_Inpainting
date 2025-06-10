@@ -1,0 +1,19 @@
+Diffusion Model Evaluation Results
+=======================
+
+Mask Type: square
+Mask Size: 64
+Image Size: 128
+
+CelebA-HQ:
+Mean L1 Loss: 0.1160
+Mean L2 Loss: 0.0725
+PSNR: 11.57 dB
+Number of Images: 20
+
+Cityscapes:
+Mean L1 Loss: 0.1914
+Mean L2 Loss: 0.1721
+PSNR: 7.83 dB
+Number of Images: 20
+
