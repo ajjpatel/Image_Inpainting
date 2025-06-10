@@ -16,16 +16,19 @@ def find_images_recursively(root):
     return sorted(image_paths)
 
 class InpaintingDataset(Dataset):
-    def __init__(self, root, dataset='celeba', image_size=128, mask_size=64, mask_type='mixed'):
+    def __init__(self, root, dataset='celeba', image_size=128, mask_size=64, mask_type='mixed', transform=None):
         self.image_size = image_size
         self.mask_size = mask_size
         self.mask_type = mask_type
-        transform_list = [
-            transforms.CenterCrop(min(image_size, image_size)),
-            transforms.Resize((image_size, image_size)),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-        ]
+        if transform:
+            transform_list = [transforms.Resize((image_size, image_size)), transform]
+        else:
+            transform_list = [
+                transforms.CenterCrop(min(image_size, image_size)),
+                transforms.Resize((image_size, image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ]
         self.transform = transforms.Compose(transform_list)
 
         if dataset == 'celeba':
@@ -48,7 +51,7 @@ class InpaintingDataset(Dataset):
     def __getitem__(self, idx):
         if hasattr(self, 'use_flat') and self.use_flat:
             img_path = self.samples[idx]
-            img = Image.open(img_path).convert('RGB')
+            img = Image.open(img_path) #.convert('RGB')
             img = self.transform(img)
         else:
             img, _ = self.dataset[idx] if isinstance(self.dataset[idx], tuple) else (self.dataset[idx], None)

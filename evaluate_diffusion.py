@@ -40,13 +40,13 @@ def save_grid():
     dst.save('gen_outputs/diffusion_citiscape_grid.png')
 
 
-def calc_metrics(pipe, device, path, mask_type='square', mask_size=64, num_samples=100):
-    dataset = InpaintingDataset(root=path, mask_type=mask_type)
+def calc_metrics(pipe, device, path, mask_type='square', mask_size=64, num_samples=20):
+    transform = transforms.ToTensor()
+    dataset = InpaintingDataset(root=path, mask_type=mask_type, transform=transform)
     loader = DataLoader(dataset, batch_size=1, 
                         pin_memory=True, shuffle=False, persistent_workers=True, 
                         num_workers=24)
     
-    transform = transforms.ToTensor()
     
     l1_loss_fn = nn.L1Loss()
     l2_loss_fn = nn.MSELoss()
@@ -76,16 +76,15 @@ def calc_metrics(pipe, device, path, mask_type='square', mask_size=64, num_sampl
         if i == num_samples - 1:
             break
 
-    num_images = num_samples
-    avg_l1_loss = total_l1_loss / num_images
-    avg_l2_loss = total_l2_loss / num_images
-    avg_psnr = total_psnr / num_images
+    avg_l1_loss = total_l1_loss / num_samples
+    avg_l2_loss = total_l2_loss / num_samples
+    avg_psnr = total_psnr / num_samples
     
     return {
         'l1_loss': avg_l1_loss,
         'l2_loss': avg_l2_loss,
         'psnr': avg_psnr,
-        'num_images': num_images
+        'num_images': num_samples
     }
 
 
@@ -134,7 +133,7 @@ if __name__ == '__main__':
     # save_grid()
     # print(calc_metrics(path, transform))
     paths = {
-        'CelebA-HQ': 'data/celeba_hq_256',
+        'CelebA-HQ': 'data/celeba_filtered',
         'Cityscapes': 'data/cityscapes/val/img'
     }
     print(paths)
