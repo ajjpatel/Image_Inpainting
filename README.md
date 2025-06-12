@@ -4,8 +4,7 @@ Contributors: Mansi Nanavati, Ajjkumar Patel
 
 This projects tackles the task of Image Inpainting with two different methods: Context Encoders and Stable Diffusion. The pipelines are tested on three datasets: CelebA-HQ, Cityscapes and Places365.
 
-The report and presentation slides are saved as `ECE_285_Image_Inpainting_Project.pdf` and `Image inpainting slides.pdf` respectively. Link to the slides: https://docs.google.com/presentation/d/1pqPN4j-e1wX6Z7c7IR5j7GyM2fOrUS3oVqVOkFf41UE/edit?usp=sharing
-
+The report and presentation slides are saved as `ECE_285_Image_Inpainting_Project.pdf` and `Image inpainting slides.pdf` respectively. The link to the recorded presentation: https://drive.google.com/file/d/1OkzEMDnJ_m673ymE-b2qB8LnS6ltmEtG/view?usp=sharing
 ## Context Encoder
 To train the context encoder, use the following command 
 ``` 
