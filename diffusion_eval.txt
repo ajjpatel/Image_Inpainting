@@ -6,14 +6,14 @@ Mask Size: 64
 Image Size: 128
 
 CelebA-HQ:
-Mean L1 Loss: 0.0279
-Mean L2 Loss: 0.0081
+Mean L1 Loss: 0.0233
+Mean L2 Loss: 0.0069
 PSNR: 22.33 dB
-Number of Images: 20
+Number of Images: 50
 
 Cityscapes:
-Mean L1 Loss: 0.0352
-Mean L2 Loss: 0.0119
-PSNR: 19.90 dB
-Number of Images: 20
+Mean L1 Loss: 0.0358
+Mean L2 Loss: 0.0121
+PSNR: 19.83 dB
+Number of Images: 50
 

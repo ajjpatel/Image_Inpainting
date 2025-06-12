@@ -72,7 +72,7 @@ def combine_grids(grid_paths, output_path):
 def main():
     parser = argparse.ArgumentParser(description="Generate inpainted samples using ContextEncoder with various mask types")
     parser.add_argument('--data_root', type=str, default="data/celebahq-256/celeba_hq_256/", help='Path to dataset root')
-    parser.add_argument('--model_path', type=str, default="outputs/G_best.pth", help='Path to trained ContextEncoder .pth file')
+    parser.add_argument('--model_path', type=str, default="celeb_outputs/G_best.pth", help='Path to trained ContextEncoder .pth file')
     parser.add_argument('--num_samples', type=int, default=4, help='Number of samples to combine in the grid')
     parser.add_argument('--image_size', type=int, default=128, help='Image size (should match training)')
     parser.add_argument('--mask_size', type=int, default=64, help='Mask size (should match training)')
